@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Verified Rental Finder</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">Verified Rental Finder</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="add-listing.html">Post House</a>
+      <a href="admin.html">Admin</a>
+      <button class="button secondary" onclick="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="dashboard-page">
+    <section class="panel">
+      <h1>My Dashboard</h1>
+      <div id="welcome"></div>
+      <div id="roleNotice" class="notice"></div>
+      <div id="ownerActions" class="action-group"></div>
+      <div id="seekerActions" class="action-group"></div>
+      <div id="adminActions" class="action-group"></div>
+    </section>
+
+    <section id="listingsSection" class="panel"></section>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

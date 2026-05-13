@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Verified Rental Finder</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <h1>Login</h1>
+    <form id="loginForm" class="auth-form">
+      <label>Email<input type="email" name="email" required /></label>
+      <label>Password<input type="password" name="password" required /></label>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="register.html">Register</a></p>
+    <button id="adminLogin" type="button" class="button secondary">Login as Admin</button>
+  </div>
+  <script src="js/auth.js"></script>
+  <script>
+    ensureGuest();
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email.value, password: form.password.value })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        window.location.href = 'index.html';
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    });
+
+    document.getElementById('adminLogin').addEventListener('click', async function () {
+      const adminEmail = 'admin@example.com';
+      const adminPassword = 'Admin1234';
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: adminEmail, password: adminPassword })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        window.location.href = 'admin.html';
+      } else {
+        alert(data.message || 'Admin login failed');
+      }
+    });
+  </script>
+</body>
+</html>

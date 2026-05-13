@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Listing - Verified Rental Finder</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">Verified Rental Finder</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <button class="button secondary" onclick="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="form-page">
+    <section class="panel">
+      <h1>Post a New House</h1>
+      <form id="listingForm" class="auth-form" enctype="multipart/form-data">
+        <label>Title<input type="text" name="title" required /></label>
+        <label>Description<textarea name="description" rows="4"></textarea></label>
+        <label>City<input type="text" name="city" required placeholder="Addis Ababa" /></label>
+        <label>Area<input type="text" name="area" required placeholder="Bole, Lideta, etc." /></label>
+        <label>Price (ETB)<input type="number" name="price" required min="5000" max="30000" /></label>
+        <label>Rooms<select name="rooms" required><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4+</option></select></label>
+        <label>Type<select name="type" required><option value="apartment">Apartment</option><option value="house">House</option><option value="room">Room</option><option value="studio">Studio</option></select></label>
+        <label>Photos<input type="file" name="photos" accept="image/*" multiple /></label>
+        <button type="submit">Submit Listing</button>
+      </form>
+      <div id="listingMessage"></div>
+    </section>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script>
+    requireAuth();
+    const form = document.getElementById('listingForm');
+    const message = document.getElementById('listingMessage');
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const response = await authFetch('/api/listings', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      if (response.ok) {
+        message.textContent = data.message;
+        message.className = 'success';
+        form.reset();
+      } else {
+        message.textContent = data.message || 'Failed to submit listing.';
+        message.className = 'error';
+      }
+    });
+  </script>
+</body>
+</html>

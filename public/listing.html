@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listing Details - Verified Rental Finder</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">Verified Rental Finder</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <button class="button secondary" onclick="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="form-page">
+    <section class="panel">
+      <div id="listingDetail"></div>
+      <div id="reviewSection"></div>
+      <div id="reviewFormContainer"></div>
+    </section>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script>
+    const listingDetail = document.getElementById('listingDetail');
+    const reviewSection = document.getElementById('reviewSection');
+    const reviewFormContainer = document.getElementById('reviewFormContainer');
+
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    async function loadListing() {
+      const id = getQueryParam('id');
+      if (!id) {
+        listingDetail.innerHTML = '<p>Listing ID missing.</p>';
+        return;
+      }
+      const [listingRes, reviewsRes] = await Promise.all([
+        fetch(`/api/listings/${id}`),
+        fetch(`/api/listings/${id}/reviews`)
+      ]);
+      if (!listingRes.ok) {
+        listingDetail.innerHTML = '<p>Unable to load listing details.</p>';
+        return;
+      }
+      const listingData = await listingRes.json();
+      const reviewsData = reviewsRes.ok ? await reviewsRes.json() : { reviews: [] };
+      renderListing(listingData.listing, reviewsData.reviews);
+    }
+
+    function renderListing(listing, reviews) {
+      const photoHtml = listing.photoList.length
+        ? `<div class="photo-gallery">${listing.photoList.map(photo => `<img src="/uploads/${photo}" alt="Listing photo" />`).join('')}</div>`
+        : '';
+      listingDetail.innerHTML = `
+        <h1>${listing.title}</h1>
+        ${photoHtml}
+        <p>${listing.description || 'No description provided.'}</p>
+        <div class="meta">
+          <span>${listing.city} • ${listing.area}</span>
+          <span>${listing.rooms} rooms</span>
+          <span>${listing.type}</span>
+        </div>
+        <p><strong>ETB ${listing.price}</strong></p>
+        <div class="notice">Contact: ${listing.owner_name} • ${listing.owner_phone} • ${listing.owner_email}</div>
+        <div class="notice">Broker verified: ${listing.owner_broker_verified ? 'Yes' : 'No'}</div>
+        <button class="button" onclick="addFavorite(${listing.id})">Add to Favorites</button>
+      `;
+
+      renderReviews(reviews);
+      renderReviewForm();
+    }
+
+    function renderReviews(reviews) {
+      if (!reviews.length) {
+        reviewSection.innerHTML = '<h2>Reviews</h2><p>No reviews yet. Be the first to review this house.</p>';
+        return;
+      }
+      reviewSection.innerHTML = `
+        <h2>Reviews</h2>
+        ${reviews.map(review => `
+          <div class="card">
+            <p><strong>${review.user_name}</strong> • Rating: ${review.rating}/5</p>
+            <p>${review.comment || ''}</p>
+            <p class="meta">${new Date(review.created_at).toLocaleDateString()}</p>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function renderReviewForm() {
+      reviewFormContainer.innerHTML = `
+        <h2>Submit a Review</h2>
+        <form id="reviewForm" class="auth-form">
+          <label>Rating<select name="rating" required>
+            <option value="">Select</option>
+            <option value="5">5</option>
+            <option value="4">4</option>
+            <option value="3">3</option>
+            <option value="2">2</option>
+            <option value="1">1</option>
+          </select></label>
+          <label>Comment<textarea name="comment" rows="4"></textarea></label>
+          <button type="submit">Submit Review</button>
+        </form>
+        <div id="reviewMessage"></div>
+      `;
+
+      document.getElementById('reviewForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const response = await authFetch('/api/reviews', {
+          method: 'POST',
+          body: JSON.stringify({
+            listing_id: getQueryParam('id'),
+            rating: formData.get('rating'),
+            comment: formData.get('comment')
+          })
+        });
+        const data = await response.json();
+        const message = document.getElementById('reviewMessage');
+        if (response.ok) {
+          message.textContent = data.message;
+          message.className = 'success';
+          loadListing();
+        } else {
+          message.textContent = data.message || 'Failed to submit review.';
+          message.className = 'error';
+          if (response.status === 401) window.location.href = 'login.html';
+        }
+      });
+    }
+
+    async function addFavorite(listingId) {
+      const response = await authFetch('/api/favorites', {
+        method: 'POST',
+        body: JSON.stringify({ listing_id: listingId })
+      });
+      if (response.ok) {
+        alert('Added to favorites');
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Failed to add favorite');
+        if (response.status === 401) window.location.href = 'login.html';
+      }
+    }
+
+    loadListing();
+  </script>
+</body>
+</html>

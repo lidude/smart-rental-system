@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verified Rental Finder</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">Verified Rental Finder</div>
+    <nav id="homeNav">
+      <a href="register.html">Register</a>
+      <a href="login.html">Login</a>
+      <a href="#search">Search Houses</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <section class="hero-content">
+      <h1>Rent a verified home in Ethiopia</h1>
+      <p>Search verified houses, contact trusted owners and brokers, and stop fake listings.</p>
+      <a class="button" href="#search">Browse Listings</a>
+    </section>
+  </main>
+
+  <section id="search" class="search-panel">
+    <h2>Find a Rental House</h2>
+    <form id="searchForm" class="filters">
+      <label>City<input type="text" name="city" placeholder="Addis Ababa" /></label>
+      <label>Area<input type="text" name="area" placeholder="Bole, Lideta, etc." /></label>
+      <label>Min Price<input type="number" name="minPrice" placeholder="1000" /></label>
+      <label>Max Price<input type="number" name="maxPrice" placeholder="5000" /></label>
+      <label>Rooms<select name="rooms"><option value="">Any</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4+</option></select></label>
+      <label>Type<select name="type"><option value="">Any</option><option value="apartment">Apartment</option><option value="house">House</option><option value="room">Room</option><option value="studio">Studio</option></select></label>
+      <button type="submit">Search</button>
+    </form>
+
+    <div id="listings" class="listing-grid"></div>
+  </section>
+
+  <section class="features">
+    <div class="feature-card">
+      <h3>Verified Brokers</h3>
+      <p>Only registered brokers with ID verification can post listings.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Admin Review</h3>
+      <p>All listings are approved by admin before going live.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Report Fake Posts</h3>
+      <p>Users can submit reports for suspicious or duplicated houses.</p>
+    </div>
+  </section>
+
+  <script src="js/auth.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

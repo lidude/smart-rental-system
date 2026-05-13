@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Verified Rental Finder</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <h1>Register</h1>
+    <form id="registerForm" class="auth-form">
+      <label>Name<input type="text" name="name" required /></label>
+      <label>Email<input type="email" name="email" required /></label>
+      <label>Phone<input type="text" name="phone" required /></label>
+      <label>Password<input type="password" name="password" required /></label>
+      <label>Role<select name="role" required>
+        <option value="seeker">House Seeker</option>
+        <option value="owner">Owner</option>
+        <option value="broker">Broker</option>
+      </select></label>
+      <label>National ID<input type="text" name="national_id" placeholder="Optional for owners/seekers" /></label>
+      <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </div>
+  <script src="js/auth.js"></script>
+  <script>
+    ensureGuest();
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        name: form.name.value,
+        email: form.email.value,
+        phone: form.phone.value,
+        password: form.password.value,
+        role: form.role.value,
+        national_id: form.national_id.value
+      };
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const body = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', body.token);
+        window.location.href = 'index.html';
+      } else {
+        alert(body.message || 'Registration failed');
+      }
+    });
+  </script>
+</body>
+</html>
